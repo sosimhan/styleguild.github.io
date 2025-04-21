@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guild DKP Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+  <style>
+    body {
+      background-color: #1c1c1c;
+      color: #e0c282;
+      font-family: 'Georgia', serif;
+    }
+    h1 {
+      font-family: 'Friz Quadrata', serif;
+      margin-top: 1rem;
+      color: #ffcc00;
+      text-shadow: 1px 1px #000;
+    }
+    .table {
+      color: #fff8dc;
+      background-color: #2e2e2e;
+    }
+    .table th, .table td {
+      border-color: #3f3f3f;
+    }
+    .navbar {
+      background-color: #111;
+    }
+    .navbar-brand {
+      color: #ffcc00 !important;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Guild DKP - Classic Style</a>
+    </div>
+  </nav>
+  <div class="container mt-4">
+    <h1 class="text-center">DKP Overview</h1>
+    <input type="text" id="searchInput" class="form-control my-3" placeholder="Search by player name..." />
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Class</th>
+          <th>Rank</th>
+          <th>Lifetime Gained</th>
+          <th>Lifetime Spent</th>
+          <th>Current DKP</th>
+        </tr>
+      </thead>
+      <tbody id="dkpTableBody">
+        <!-- Data will be injected here by JS -->
+      </tbody>
+    </table>
+    <canvas id="dkpChart" height="120"></canvas>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const data = [
+      { name: "Sulajae", class: "Shaman", rank: "Officer", gain: 268, spent: 50 },
+      { name: "Runwild", class: "Warrior", rank: "Member", gain: 140, spent: 0 },
+      { name: "Healme", class: "Priest", rank: "Member", gain: 157, spent: 30 },
+      { name: "Holyblade", class: "Paladin", rank: "Core", gain: 200, spent: 95 },
+      { name: "Arcanechan", class: "Mage", rank: "Member", gain: 135, spent: 45 }
+    ];
+
+    const dkpTableBody = document.getElementById('dkpTableBody');
+    const searchInput = document.getElementById('searchInput');
+
+    function renderTable(filter = "") {
+      dkpTableBody.innerHTML = "";
+      data.filter(player => player.name.toLowerCase().includes(filter.toLowerCase()))
+          .forEach(player => {
+            const row = `<tr>
+              <td>${player.name}</td>
+              <td>${player.class}</td>
+              <td>${player.rank}</td>
+              <td>${player.gain}</td>
+              <td>${player.spent}</td>
+              <td>${player.gain - player.spent}</td>
+            </tr>`;
+            dkpTableBody.innerHTML += row;
+          });
+    }
+
+    renderTable();
+    searchInput.addEventListener("input", e => renderTable(e.target.value));
+
+    const ctx = document.getElementById('dkpChart');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.map(p => p.name),
+        datasets: [{
+          label: 'Current DKP',
+          data: data.map(p => p.gain - p.spent),
+          backgroundColor: '#e0c282'
+        }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            labels: {
+              color: '#fff8dc'
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#fff8dc'
+            }
+          },
+          y: {
+            ticks: {
+              color: '#fff8dc'
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
